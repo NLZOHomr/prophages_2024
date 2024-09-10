@@ -79,20 +79,20 @@ makeFastANIDistMatrix <- function(f, keep_asym = FALSE, frac = FALSE, suffix = "
 
 #' Mapping files:
 #bacterial isolates
-bacteriaMap=read_csv('~/Desktop/HQ_prophage_collection/bacteria_metadata.csv')
+bacteriaMap=read_csv('DataAnalysis/bacteria_metadata.csv')
 
 #prophages from different tools
 #phaster
-phasterMap=read_csv('~/Desktop/HQ_prophage_collection/phaster_metadata.csv')
+phasterMap=read_csv('DataAnalysis/phaster_metadata.csv')
 
 #vibrant
-vibrantMap=read_csv('~/Desktop/HQ_prophage_collection/vibrant_metadata.csv')
+vibrantMap=read_csv('DataAnalysis/vibrant_metadata.csv')
 
 #cenote-taker3
-ct3Map=read_csv('~/Desktop/HQ_prophage_collection/ct3_metadata.csv')
+ct3Map=read_csv('DataAnalysis/ct3_metadata.csv')
 
 #vOTU data
-vOTU=read_delim('~/Desktop/HQ_prophage_collection/mmseqs2output/mmseqs95_cluster.tsv') %>%
+vOTU=read_delim('DataAnalysis/mmseqs95_cluster.tsv') %>%
   mutate(header_id=gsub("MB20_", "MB20-", header_id),
          header_id=gsub("MB18_", "MB18-", header_id),
          header_id=gsub("Btheta_", "", header_id))
@@ -101,13 +101,13 @@ vOTU=read_delim('~/Desktop/HQ_prophage_collection/mmseqs2output/mmseqs95_cluster
 
 
 #' detection of vOTUs in other databases
-mgv_match=read.delim("~/Desktop/HQ_prophage_collection/MGV_besthit.m8.tsv", header=F)
-gpd_match=read.delim("~/Desktop/HQ_prophage_collection/GPD_besthit.m8.tsv", header=F)
-gvd_match=read.delim("~/Desktop/HQ_prophage_collection/GVD_besthit.m8.tsv", header=F)
+mgv_match=read.delim("DataAnalysis/MGV_besthit.m8.tsv", header=F)
+gpd_match=read.delim("DataAnalysis/GPD_besthit.m8.tsv", header=F)
+gvd_match=read.delim("DataAnalysis/GVD_besthit.m8.tsv", header=F)
 
-mgv_map=read.delim("~/Desktop/HQ_prophage_collection/mgv_matched_metadata.tsv", header=F)
-gpd_map=read.delim("~/Desktop/HQ_prophage_collection/gpd_matched_metadata.tsv", header=F)
-gvd_map=read.delim("~/Desktop/HQ_prophage_collection/gvp_matched_metadata.tsv", header=F)
+mgv_map=read.delim("DataAnalysis/mgv_matched_metadata.tsv", header=F)
+gpd_map=read.delim("DataAnalysis/gpd_matched_metadata.tsv", header=F)
+gvd_map=read.delim("DataAnalysis/gvp_matched_metadata.tsv", header=F)
 
 
 
@@ -135,7 +135,7 @@ Fig1=ggnested(bacteriaMap,
                      breaks = seq(0,17,2))
 
 ####' fastANI with targeted bacterial genomes
-x <- read.table("~/Desktop/HQ_prophage_collection/fastani_wgs_output.txt")
+x <- read.table("DataAnalysis/fastani_wgs_output.txt")
 matrix <- acast(x, V1~V2, value.var="V3")
 matrix[is.na(matrix)] <- 70
 
@@ -339,7 +339,7 @@ tmp4_order_v2%>%group_by(vOTU) %>%
 # )
 
 # creating a fastANI figure of WGS where prophages are derived from 
-x <- read.table("~/Desktop/HQ_prophage_collection/fastani_wgs_output.txt")
+x <- read.table("DataAnalysis/fastani_wgs_output.txt")
 
 mergedTmp=tmp4_order_v2 %>% left_join(bacteriaMap)
 includedWGS=unique(mergedTmp$newName)
@@ -398,7 +398,7 @@ Fig7=vOTU_all %>%
 
 ###### PROPHAGES IN FECAL WATER SAMPLES ######
 #' coverage calculated using coverM 
-coverage_df=read_delim("~/Desktop/HQ_prophage_collection/prophage_metag.cov") 
+coverage_df=read_delim("DataAnalysis/prophage_metag.cov") 
 
 v_map=vOTU_all %>% filter(tool == 'vibrant') %>% 
   left_join(Vmap[-c(4,6)], by=c('scaffold_new', "Identification", "name", "prophageID"))
@@ -447,7 +447,7 @@ mgv=left_join(mgv_match, mgv_map, by=c('ref' = 'V1'))
 
 # Summarizing genomic information of identified prophages
 
-checkV_summ=read_csv("OneDrive - Ministrstvo za javno upravo - zdravstvo-65868816-Nacionalni laboratorij za zdravje, okolje in hrano/HQ_prophage_collection/checkV_summary_prophages.csv") %>%
+checkV_summ=read_csv("DataAnalysis/checkV_summary_prophages.csv") %>%
   mutate(contig_id=gsub("Btheta_", "", contig_id),
          contig_id=str_split(contig_id, '_intact', simplify = T)[,1],
          contig_id=gsub("MB20-", "MB20_", contig_id),
@@ -473,14 +473,14 @@ summary_prophage_quality=prophage_stats %>%
             #phaster=if_else(unique(tool.x) == 'phaster', 1, 0)
             )
 
-#write.csv(summary_prophage_quality, 'Desktop/HQ_prophage_collection/summary_stats_high_quality_prophages.csv')
+#write.csv(summary_prophage_quality, 'DataAnalysis/summary_stats_high_quality_prophages.csv')
 
 
 #########
 
 # How many prophage genes are annotated?
 
-df <- readxl::read_xlsx('OneDrive - Ministrstvo za javno upravo - zdravstvo-65868816-Nacionalni laboratorij za zdravje, okolje in hrano/HQ_prophage_collection/manuscript/BMCmicrobiology_submissionn/Supplemental Table S2.xlsx')
+df <- readxl::read_xlsx('DataAnalysis/Supplemental Table S2.xlsx')
 
 df=df%>% column_to_rownames('ORF')
 df=df[8:30]
