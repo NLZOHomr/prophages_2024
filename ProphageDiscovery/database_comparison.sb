@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#SBATCH --cpus-per-task=24
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem-per-cpu=4G
+#SBATCH --time=1:00:00
+#SBATCH --job-name=mmseqs2
+
+
+source /home/nejc/.bashrc
+source activate metaTools
+
+dir='/volumes/homehpc/storage/finished_projects/NejcS/NLZOH/gut_prophages/HQ_prophage_collection/mmseqs2_output'
+cd $dir
+
+mkdir mmseqs2_output
+
+mmseqs easy-cluster $dir/mmseqs_95_rep_seq.fasta $dir/mmseqs2_output/mmseqs_95 $dir/tmp --min-seq-id 0.95 -c 0.8 --cov-mode 0
+
+
+### Comparing HQ vOTUs with the prophages from other databses.
+# Using GVD, GPD and MGV databases
+
+
+../phage_DB/
+GPD_sequences.fa
+GVDv1_viralpopulations.fna
+GVDv1_viralpopulations.fna.tar.gz
+mgv_contigs.fna
+
+mmseqs easy-search examples/QUERY.fasta examples/DB.fasta alnRes.m8 tmp
+
+mmseqs createdb ../phage_DB/GVDv1_viralpopulations.fna  ../phage_DB/GVD_DB_mmseqs
+mmseqs createdb ../phage_DB/mgv_contigs.fna  ../phage_DB/MGV_DB_mmseqs
+
+mmseqs createindex ./phage_DB/MGV_DB_mmseqs tmp
+mmseqs createindex ./phage_DB/GVD_DB_mmseqs tmp
+mmseqs createindex ./phage_DB/GPD_DB_mmseqs tmp
+
+
+dir='/volumes/homehpc/storage/finished_projects/NejcS/NLZOH/gut_prophages/HQ_prophage_collection/mmseqs2_output'
+
+mmseqs easy-search ${dir}/mmseqs_95_rep_seq.fasta ./phage_DB/MGV_DB_mmseqs alnRes.m8 tmp
